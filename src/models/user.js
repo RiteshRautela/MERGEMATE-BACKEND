@@ -1,4 +1,6 @@
 const mongoose = require("mongoose")
+const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs")
 // we create schema using the mongoose.Schea() function which aceept object amd here we define fields and datatype of the Document, here we are creating userSchema 
 // in schema we follow camel case naming ... 
 const userSchema = new mongoose.Schema({
@@ -38,7 +40,27 @@ const userSchema = new mongoose.Schema({
         default:"This is a defualt about of the user "
     },
 
-})
+}, {timestamps:true}
+)
+
+// schema methods 
+userSchema.methods.getJWT = function() {
+    // 'this' here points to the specific user document
+    const user = this;
+    
+    // Create the JWT using the user's ID
+    const token = jwt.sign({ _id: user._id }, "secretmasala@123_321", { expiresIn: "7d" });
+    
+    return token;
+}
+
+userSchema.methods.validatePassword = async function(password){
+    // this here points to the specific user doucment 
+    const user= this
+     const isPasswordValid = await bcrypt.compare(password, user.password)
+     return isPasswordValid;
+}
+
 
 // once we created a schema now we create a model 
 // we do mogoose.model(name of the model , schema )
