@@ -10,15 +10,24 @@ app.use(express.json())
 // cookie parser miidleware to read/write cookie made by expressjs
 app.use(cookieParser());
 
-// importing routes
-const authRouter = require("./routes/auth")
-const profileRouter = require("./routes/profile")
-const requestRouter = require("./routes/request")
 
-// how to use this routes ? suppose a api comes in eg==> /login ,  it will come over app.use("/" , authRouter) it check"/" and goes to authRouter then it will check for all the apis over authRouter like signup , login , it will match login and run login code and if the respons is sendfrom login then it will not go anyfurther pff
-app.use("/" , authRouter)
-app.use("/" , profileRouter)
-app.use("/" , requestRouter)
+// 📦 Importing route files (each file contains related API routes)
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
+
+// 🔗 Connecting the routers to the main app
+// This tells Express: "Hey, check these route files when any request comes in"
+
+// Example: A POST request comes to /login
+// 👉 First, it checks authRouter (since "/" matches)
+// 👉 Inside authRouter, it looks for a matching route like router.post("/login")
+// 👉 If found, it runs that function and sends a response
+// ❌ After a response is sent, Express does NOT check the next routers (like profileRouter or requestRouter)
+
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 
 
