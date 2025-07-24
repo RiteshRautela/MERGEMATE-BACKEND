@@ -12,6 +12,24 @@ const validateSignupInput = (req) => {
     }
 };
 
+const validaeEditProfileData = (req) =>{
+ try {
+
+    const allowedEditFieds = ["firstName", "lastName", "emailId","gender","age" , "about" ,"skills"];
+    // loop thro req body and check if all things mathcing this criteria or not 
+     const isEditAllowed = Object.keys(req.body).every(field => allowedEditFieds.includes(field)) // return a boolean 
+     if(!isEditAllowed){
+        throw new Error("invalid edit req")
+     }
+    
+ } catch (err) {
+    throw new Error(err.message)
+ }
+
+ 
+}
 module.exports = {
-    validateSignupInput
-};
+    validateSignupInput,
+    validaeEditProfileData
+}
+
