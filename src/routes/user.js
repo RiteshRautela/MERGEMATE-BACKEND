@@ -1,0 +1,29 @@
+const express = require("express")
+const userRouter = express.Router()
+const { userAuth } = require("../middlewares/auth"); 
+const connectionRequestModel =  require("../models/connectionRequest")
+
+//! GET /user/requests/received (Get all pending  connection requests for the loggedInuser)
+
+userRouter.get("/user/requests/received" ,  userAuth, async (req,res) => {
+try {
+    const loggedInUser = req.user;
+
+    const connectionRequest = await connectionRequestModel.find({
+        toUserId:loggedInUser._id,
+        status:"interested"
+    }).populate("fromUserId" , ["firstName" , "lastName"])
+
+    res.json({
+        message:"Data fetched successfully ",
+        data:connectionRequest
+    })
+    
+} catch (err) {
+    res.status(400).send("Error :" + err.message)
+}
+
+})
+
+
+module.exports = userRouter

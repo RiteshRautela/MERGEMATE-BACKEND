@@ -25,15 +25,13 @@ const userSchema = new mongoose.Schema({
         type:Number,
         min:18,
     },
-    gender:{
-    type:String ,
-    validate(value) {
-        if (!["male", "female", "others"].includes(value.toLowerCase())) {
-          throw new Error("Gender data is not valid");
-        }
-      }
-        
-    },
+    gender: {
+        type: String,
+        enum: {
+          values: ["male", "female", "others"],
+          message: '{VALUE} is not a valid gender', // ✅ use single/double quotes
+        },
+      },
 
     about:{
         type:String,
