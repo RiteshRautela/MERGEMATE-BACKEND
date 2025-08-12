@@ -28,10 +28,10 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
 
 
         // check if toUserId(person whom we are sending a connection request) is even exist in the DB
-        const toUser = await await User.findById( toUserId )
+        const toUser = await User.findById(toUserId)
         // if toUserId(receiver) don't exist
-        if(!toUser){
-            res.status(404).json({message: "usernot found "})
+        if (!toUser) {
+            res.status(404).json({ message: "usernot found " })
         }
         /**
          * 🔍 Check if a connection request already exists between Kermit and Jack
@@ -79,12 +79,25 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
         // The 'data' variable will hold the final saved document, including its new '_id' and timestamps
         const data = await connectionRequest.save();
 
+        // --- Create a dynamic success message based on the status ---
+        const senderName = req.user.firstName;
+        const receiverName = toUser.firstName;
+        let successMessage = ''; // Initialize an empty message variable
+
+        if (status === 'interested') {
+            successMessage = `Connection request sent successfully from ${senderName} to ${receiverName}.`;
+        } else if (status === 'ignored') {
+            // This message will be used if the status is 'ignored'
+            successMessage = `${senderName} has ignored ${receiverName}.`;
+        }
+
+
         // 📤 Send success response back to frontend
         res.json({
-            message: `  Connection request sent successfully from${req.user.firstName}  to ${ toUser.firstName } `,
+            message:  successMessage ,
             data: data
         });
-        
+
 
     } catch (err) {
         // ❌ Handle any unexpected server/database errors
@@ -92,50 +105,50 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
     }
 });
 
-requestRouter.post("/request/review/:status/:requestId" , userAuth, async(req,res)=>{
+requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, res) => {
     try {
         // get the loggedIn user
         const loggedInUser = req.user;
-        const {status,requestId } = req.params
+        const { status, requestId } = req.params
         // validate this accepted rejected like only this two are allowed 
-        const allowedStatus = ["accepted" , "rejected"]
-        if(!allowedStatus.includes(status)){
+        const allowedStatus = ["accepted", "rejected"]
+        if (!allowedStatus.includes(status)) {
             return res.status(400).json({
-                message:"Invalid Status or Status not allowed",
-                success:false
+                message: "Invalid Status or Status not allowed",
+                success: false
             })
         }
 
         // validating the requestId (a document _id ) 
         const connectionRequest = await connectionRequestModel.findOne({
-            _id:requestId,
-            toUserId:loggedInUser._id,
-            status:"interested"
+            _id: requestId,
+            toUserId: loggedInUser._id,
+            status: "interested"
         })
 
-        if(!connectionRequest){
+        if (!connectionRequest) {
             res.status(404).json({
-                message:"request not found",
-                success:false
+                message: "request not found",
+                success: false
             })
         }
 
         // update the status
         connectionRequest.status = status
         // save the document 
-          const data = await connectionRequest.save();
+        const data = await connectionRequest.save();
 
         res.status(200).json({
             message: "connection request" + status,
-            data:data,
-            success:true
+            data: data,
+            success: true
         })
     } catch (err) {
         res.status(400).send("Error: " + err.message);
     }
 
 
-    
+
 })
 
 // 🚪 Export the router so it can be used in app.js
