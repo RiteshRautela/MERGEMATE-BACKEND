@@ -61,7 +61,7 @@ authRouter.post("/login", async (req, res) => {
        
 
         // If both email and password are valid, send the user data as response
-        res.send("user log in successfully");
+        res.send(user);
 
     } catch (err) {
         // Catch any error during the process and send a 400 Bad Request response with the error message

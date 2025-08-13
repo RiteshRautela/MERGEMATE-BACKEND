@@ -2,6 +2,7 @@ const express = require("express")
 const app = express()
 const connectDB = require("./config/database")
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 
 
@@ -9,6 +10,14 @@ const cookieParser = require('cookie-parser');
 app.use(express.json())
 // cookie parser miidleware to read/write cookie made by expressjs
 app.use(cookieParser());
+
+// Enable CORS for all routes in the application
+// This allows the frontend (running on a different domain/port)
+// to make requests to the backend without getting blocked by the browser
+app.use(cors({
+    origin: 'http://localhost:5173', // Your frontend URL
+    credentials: true                // Allow cookies to be sent
+  }));
 
 
 // 📦 Importing route files (each file contains related API routes)
