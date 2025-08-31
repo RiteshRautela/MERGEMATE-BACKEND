@@ -18,8 +18,16 @@ authRouter.post("/signup", async (req, res) => {
             emailId,     // ✅ correct spelling
             password: passwordHash
         });
-        await user.save() // data will be save onto the database and save() function return a promise , so we will use await 
-        res.send("user Added successfully")
+        const savedUser =  await user.save() // data will be save onto the database and save() function return a promise , so we will use await 
+        
+        // create a jwt token using jwt.sign()
+        // const token =   jwt.sign({_id:user._id} , "secretmasala@123_321" , {expiresIn:"7d"})
+        const token =   savedUser.getJWT()
+
+        // add the token to cookie and send back to user
+        //Assuming 'token' variable holds your generated JWT string
+        res.cookie("token" , token , {expires: new Date (Date.now()+8*3600000)}) // this cookies expires in 8hr pff
+        res.status(201).json(savedUser)
     } catch (err) {
         res.status(400).send("Error Saving the user :" + err.message)
     }
@@ -44,12 +52,15 @@ authRouter.post("/login", async (req, res) => {
         // Comparing the plain password (from client) with the hashed password stored in the database (user.password)
         // bcrypt.compare() returns true if passwords match, otherwise false
         // const isPasswordValid = await bcrypt.compare(password, user.password);
-        const isPasswordValid = user.validatePassword(password)
+        // dont forget to use await , face problem to show error in frontend bc error are not showing up  
+        const isPasswordValid = await user.validatePassword(password)
 
-        // If password doesn't match, throw an error
+        // If password doesn't match, throw an error in json 
         if (!isPasswordValid) {
-            throw new Error("Invalid password");
-        }
+        //    return res.status(401).json({ error: "Invalid password" });
+        throw new Error("Invalid password");
+          }
+          
 
         // create a jwt token using jwt.sign()
         // const token =   jwt.sign({_id:user._id} , "secretmasala@123_321" , {expiresIn:"7d"})
@@ -65,7 +76,7 @@ authRouter.post("/login", async (req, res) => {
 
     } catch (err) {
         // Catch any error during the process and send a 400 Bad Request response with the error message
-        res.status(400).send("Error logging in the user: " + err.message);
+        res.status(400).send( err.message);
     }
 });
 

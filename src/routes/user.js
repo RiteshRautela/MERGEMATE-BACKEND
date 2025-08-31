@@ -9,11 +9,13 @@ const User = require('../models/user')
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
     try {
         const loggedInUser = req.user;
+        // Define all the fields the frontend UserCard needs
+        const requiredFields = "firstName lastName photoUrl about gender age skills";
 
         const connectionRequest = await connectionRequestModel.find({
             toUserId: loggedInUser._id,
             status: "interested"
-        }).populate("fromUserId", ["firstName", "lastName"])
+        }).populate("fromUserId", requiredFields)
 
         res.json({
             message: "Data fetched successfully ",
@@ -30,6 +32,8 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 
     try {
         const loggedInUser = req.user;
+        // The fields your UserCard component needs to display
+        const requiredFields = "firstName lastName photoUrl about gender age skills";
 
         // find all the connection
         const connectionRequest = await connectionRequestModel.find({
@@ -38,7 +42,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
                 { toUserId: loggedInUser._id, status: "accepted" },
                 { fromUserId: loggedInUser._id, status: "accepted" }
             ],
-        }).populate("fromUserId", ["firstName", "lastName"]).populate("toUserId", ["firstName", "lastName"]) // Also populate toUserId
+        }).populate("fromUserId" , requiredFields).populate("toUserId", requiredFields) // Also populate toUserId
 
         const data = connectionRequest.map((row) => {
             /// This part runs if the logged-in user (Will) is the SENDER.
@@ -102,7 +106,7 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
                 // id in User should not equal to the loggedinuser aka the user should no see his card in the feed :)
                 { _id: { $ne: loggedInUser._id } }
             ]
-        }).select("firstName lastName age gender anout skills").skip(skip).limit(limit)
+        }).select("firstName lastName age gender about skills photoUrl").skip(skip).limit(limit)
 
         res.send(user)
     } catch (err) {

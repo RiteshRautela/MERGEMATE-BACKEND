@@ -16,7 +16,7 @@ app.use(cookieParser());
 // to make requests to the backend without getting blocked by the browser
 app.use(cors({
     origin: 'http://localhost:5173', // Your frontend URL
-    credentials: true                // Allow cookies to be sent
+    credentials: true,              // Allow cookies to be sent
   }));
 
 

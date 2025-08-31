@@ -4,7 +4,9 @@ const userAuth = async (req, res, next) => {
     try {
         const { token } = req.cookies;
         if (!token) {
-            throw new Error("Authentication failed: No token provided.");
+            // throw new Error("Authentication failed: No token provided.");
+            // 401 --> yoy're not authorized
+           return res.status(401).send("please login")
         }
 
         // Validate the token

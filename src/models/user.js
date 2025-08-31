@@ -27,8 +27,10 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
+        lowercase:true,
         enum: {
           values: ["male", "female", "others"],
+          lowercase:true,
           message: '{VALUE} is not a valid gender', // ✅ use single/double quotes
         },
       },
