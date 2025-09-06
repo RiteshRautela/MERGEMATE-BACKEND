@@ -4,6 +4,7 @@ const connectionRequestModel = require("../models/connectionRequest"); // Mongoo
 const requestRouter = express.Router();
 const User = require("../models/user")
 
+
 /**
  * 📨 Route: POST /request/send/:status/:toUserId
  * Purpose: Send a connection request from logged-in user (Kermit) to another user (Jack)
@@ -31,7 +32,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
         const toUser = await User.findById(toUserId)
         // if toUserId(receiver) don't exist
         if (!toUser) {
-            res.status(404).json({ message: "usernot found " })
+            return res.status(404).json({ message: "usernot found " })
         }
         /**
          * 🔍 Check if a connection request already exists between Kermit and Jack
@@ -78,8 +79,11 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
 
         // The 'data' variable will hold the final saved document, including its new '_id' and timestamps
         const data = await connectionRequest.save();
+      
+      
 
         // --- Create a dynamic success message based on the status ---
+        
         const senderName = req.user.firstName;
         const receiverName = toUser.firstName;
         let successMessage = ''; // Initialize an empty message variable

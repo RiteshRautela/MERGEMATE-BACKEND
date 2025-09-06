@@ -10,7 +10,7 @@ const userAuth = async (req, res, next) => {
         }
 
         // Validate the token
-        const decodedPayload = jwt.verify(token, "secretmasala@123_321");
+        const decodedPayload = jwt.verify(token, process.env.JWT_SECRET);
         
         // Find the user with _id from the payload
         const user = await User.findById(decodedPayload._id);
